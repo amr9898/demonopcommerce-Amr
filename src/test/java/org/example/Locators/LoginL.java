@@ -7,7 +7,8 @@ public enum LoginL {
     LOGIN_EMAIL_FIELD(By.xpath("//*[@id='Email']")),
     LOGIN_PASSWORD_FIELD(By.xpath("//*[@id='Password']")),
     MYACCOUNT_BUTTON(By.xpath("//*[@class='ico-account']")),
-    LOGIN_BUTTON(By.cssSelector("button.button-1.login-button"));
+    LOGIN_BUTTON(By.cssSelector("button.button-1.login-button")),
+    ERROR_MESSAGE(By.xpath("//*[contains(text(),'Login was unsuccessful')]"));
     private final By locator;
     LoginL(By locator){
         this.locator = locator;

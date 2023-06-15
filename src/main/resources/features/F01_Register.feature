@@ -16,4 +16,4 @@ Feature: F01_Register | users could register with new accounts
 
  Examples:
   | first name | last name |type|date of birth|     Email         |company   |password |
-  |automation  |  tester   |male|  13/6/1998  |test109@example.com|happy time|P@sssw0rd |
+  |automation  |  tester   |male|  13/6/1998  |test@example.com|happy time|P@sssw0rd |

@@ -3,6 +3,7 @@ package org.example.pages;
 import org.example.stepDefs.Hooks;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 
@@ -34,6 +35,20 @@ public class P02_Login {
     }
     public WebElement my_account(){
         return Hooks.driver.findElement(MYACCOUNT_BUTTON.by());
+    }
+
+    public String error_message_for_invalid_login() {
+        return Hooks.driver.findElement(ERROR_MESSAGE.by()).getText();
+    }
+    public String get_color() {
+        WebElement eleSearch = Hooks.driver.findElement(ERROR_MESSAGE.by());
+
+        String rgbFormat = eleSearch.getCssValue("color");
+
+        String hexcolor = Color.fromString(rgbFormat).asHex(); //converted Into HexFormat
+        System.out.println(hexcolor);// Output of Hex code will be  => #febd69
+
+        return hexcolor;
     }
 
 
