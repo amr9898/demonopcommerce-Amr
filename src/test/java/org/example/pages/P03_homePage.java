@@ -1,12 +1,15 @@
 package org.example.pages;
 
-import org.example.Locators.HomePageL;
 import org.example.stepDefs.Hooks;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
 import org.openqa.selenium.support.ui.Select;
-import org.testng.Assert;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.asserts.SoftAssert;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.example.Locators.HomePageL.*;
@@ -40,4 +43,43 @@ public class P03_homePage {
         softAssert.assertAll();
 
     }
+
+    public void add_item_to_search_field( String item ){
+        Hooks.driver.findElement(By.xpath("//*[@id='small-searchterms']")).sendKeys(item);
+        Hooks.driver.findElement(By.xpath("//*[@type='submit']")).click();
+
+    }
+
+    public int size_of_searched_results() {
+
+        WebDriverWait wait = new WebDriverWait(Hooks.driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@class='product-item']")));
+
+        int totalCount = 0;
+
+        while (true) {
+
+            List<WebElement> searchResults = Hooks.driver.findElements(By.xpath("//*[@class='product-item']"));
+
+            int count = searchResults.size();
+            totalCount += count;
+
+            WebElement element=Hooks.driver.findElement(By.xpath("//*[@class='next-page']"));
+
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@class='next-page']")));
+    if (element.isEnabled()) {
+
+        element.click();
+
+
+        wait.until(ExpectedConditions.stalenessOf(searchResults.get(0)));
+
+
+    } else {
+        break;
+    }}
+        return totalCount;
+    }
+
+
 }
