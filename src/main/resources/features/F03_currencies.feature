@@ -1,4 +1,4 @@
-#@smoke
+@smoke
 Feature: F03_Changing currency
     As a user, I want to be able to change the currency from the home page
     to get featured products in a currency that I had been chosen
