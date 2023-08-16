@@ -2,20 +2,24 @@ package org.example.pages;
 
 import org.example.stepDefs.Hooks;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
-
 import java.time.Duration;
 import java.util.List;
-
 import static org.example.Locators.HomePageL.*;
 
 
 public class P03_homePage {
+    private String item;
+   private int match_item =0;
+private int total= 0;
     private SoftAssert softAssert= new SoftAssert();
     public WebElement navigate_to_homepage()
     {return Hooks.driver.findElement(HOME_PAGE.by()) ;}
@@ -45,40 +49,80 @@ public class P03_homePage {
     }
 
     public void add_item_to_search_field( String item ){
-        Hooks.driver.findElement(By.xpath("//*[@id='small-searchterms']")).sendKeys(item);
-        Hooks.driver.findElement(By.xpath("//*[@type='submit']")).click();
+        this.item=item;
+        Hooks.driver.findElement(ADD_ITEM.by()).sendKeys(item);
+        Hooks.driver.findElement(SUBMIT_SEARCH.by()).click();
 
     }
 
     public int size_of_searched_results() {
 
-        WebDriverWait wait = new WebDriverWait(Hooks.driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@class='product-item']")));
+        try {WebElement element = Hooks.driver.findElement(NEXT_PAGE_SEARCH.by());
+            return count_total(element);}
+        catch (org.openqa.selenium.NoSuchElementException e){
+            List<WebElement> searchResults = Hooks.driver.findElements(SEARCHED_ITEM.by());
+            check_product(searchResults);
+            return total;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
-        int totalCount = 0;
 
+    }
+public void check_product (List<WebElement> Results){
+
+    String searchString = item;
+    int count =Results.size();
+
+    for (WebElement searchResult : Results) {
+        String resultText = searchResult.getText().toLowerCase();
+
+        if (resultText.contains(searchString.toLowerCase())) {
+
+           match_item++;
+        }
+    }
+    total+= count;
+
+
+
+}
+public void valid_item(){
+    System.out.println(match_item );
+    System.out.println(total);
+        softAssert.assertEquals(match_item,total);
+        softAssert.assertAll();
+}
+public void click_on_first_item(){
+
+        Hooks.driver.findElement(FIRST_ITEM.by()).click();
+    }
+
+    public void check_result() {
+        final Wait<WebDriver> wait = new WebDriverWait(Hooks.driver, Duration.ofSeconds(5)).ignoring(StaleElementReferenceException.class);
+          wait.until(ExpectedConditions.presenceOfElementLocated(SKU_SEARCH_ITEM.by()));
+        WebElement searchResult = Hooks.driver.findElement(SKU_SEARCH_ITEM.by());
+            Assert.assertEquals(searchResult .getText(), item);
+
+
+    }
+    public int count_total(WebElement element) throws InterruptedException {
         while (true) {
+            Thread.sleep(3000);
+            List<WebElement> searchResults = Hooks.driver.findElements(ITEMS_NEXT_PAGE.by());
+            int count = 0;
+            count = searchResults.size();
+            try {
+                element.click();
+                check_product(searchResults);
 
-            List<WebElement> searchResults = Hooks.driver.findElements(By.xpath("//*[@class='product-item']"));
-
-            int count = searchResults.size();
-            totalCount += count;
-
-            WebElement element=Hooks.driver.findElement(By.xpath("//*[@class='next-page']"));
-
-    wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@class='next-page']")));
-    if (element.isEnabled()) {
-
-        element.click();
-
-
-        wait.until(ExpectedConditions.stalenessOf(searchResults.get(0)));
-
-
-    } else {
-        break;
-    }}
-        return totalCount;
+            } catch (StaleElementReferenceException e) {
+                total += count;
+                break;
+            }
+        }
+        System.out.println(match_item);
+        return total;
     }
 
 
